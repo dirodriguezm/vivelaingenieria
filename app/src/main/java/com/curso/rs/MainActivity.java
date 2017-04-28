@@ -24,9 +24,9 @@ public class MainActivity extends AppCompatActivity {
     public ImageButton aux;
     public ImageButton rs[];
     public Button accion,reset;
-    private Integer posicion;
+    private Integer posicion=4;
     public String r,s,b;
-    int posicion_actual,count;
+    int count=0;
     HashMap <ImageButton,Integer> map;
     String quehayen[];
     RadioGroup rdgGroup;
@@ -79,12 +79,14 @@ public class MainActivity extends AppCompatActivity {
                                 quehayen[posicion] = "B";
                                 quehayen[posicion + 2] = "R";
                                 sonar(1);
+                                count++;
                             } else if (posicion+1<9 && quehayen[posicion + 1] == "B") {
                                 im.setImageResource(R.drawable.blanco);
                                 rs[posicion + 1].setImageResource(R.drawable.sapo);
                                 quehayen[posicion] = "B";
                                 quehayen[posicion + 1] = "R";
                                 sonar(1);
+                                count++;
                             }
                         } else if (quehayen[posicion] == "S") {
                             if (posicion - 2 >= 0 && quehayen[posicion - 2] == "B") {
@@ -93,16 +95,21 @@ public class MainActivity extends AppCompatActivity {
                                 quehayen[posicion] = "B";
                                 quehayen[posicion - 2] = "S";
                                 sonar(0);
+                                count++;
                             } else if (posicion - 1 >= 0 &&quehayen[posicion - 1] == "B") {
                                 im.setImageResource(R.drawable.blanco);
                                 rs[posicion - 1].setImageResource(R.drawable.rana);
                                 quehayen[posicion] = "B";
                                 quehayen[posicion - 1] = "S";
                                 sonar(0);
+                                count++;
                             }
                         }
                         if(ganar()){
                             compartir();
+                        }else if(perder()){
+                            Toast.makeText(getApplicationContext(),"Perdió intentelo nuevamente",Toast.LENGTH_SHORT).show();
+                            iniciar();
                         }
                     }
                 }
@@ -112,20 +119,22 @@ public class MainActivity extends AppCompatActivity {
         accion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!tactil) {
+                if(!tactil  ) {
                     if (quehayen[posicion] == "R") {
-                        if (quehayen[posicion + 2] == "B" && posicion+2<9) {
+                        if (posicion+2<9 && quehayen[posicion + 2] == "B") {
                             aux.setImageResource(R.drawable.blanco);
                             rs[posicion + 2].setImageResource(R.drawable.sapo);
                             quehayen[posicion] = "B";
                             quehayen[posicion + 2] = "R";
                             sonar(1);
-                        } else if (quehayen[posicion + 1] == "B") {
+                            count++;
+                        } else if (posicion+1<9 && quehayen[posicion + 1] == "B") {
                             aux.setImageResource(R.drawable.blanco);
                             rs[posicion + 1].setImageResource(R.drawable.sapo);
                             quehayen[posicion] = "B";
                             quehayen[posicion + 1] = "R";
                             sonar(1);
+                            count++;
                         }
                     } else if (quehayen[posicion] == "S") {
                         if (posicion - 2 >= 0 && quehayen[posicion - 2] == "B") {
@@ -134,16 +143,21 @@ public class MainActivity extends AppCompatActivity {
                             quehayen[posicion] = "B";
                             quehayen[posicion - 2] = "S";
                             sonar(0);
-                        } else if (quehayen[posicion - 1] == "B") {
+                            count++;
+                        } else if (posicion - 1 >= 0 &&quehayen[posicion - 1] == "B") {
                             aux.setImageResource(R.drawable.blanco);
                             rs[posicion - 1].setImageResource(R.drawable.rana);
                             quehayen[posicion] = "B";
                             quehayen[posicion - 1] = "S";
                             sonar(0);
+                            count++;
                         }
                     }
                     if(ganar()){
                         compartir();
+                    }else if(perder()){
+                        Toast.makeText(getApplicationContext(),"Perdió intentelo nuevamente",Toast.LENGTH_SHORT).show();
+                        iniciar();
                     }
                 }
 
@@ -162,8 +176,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private boolean perder() {
+        boolean perder=true;
+        for(int i=0;i<9;i++) {
+
+            if (quehayen[i] == "R") {
+                if (i + 2 < 9 && quehayen[i + 2] == "B") {
+                    perder = false;
+                } else if (i + 1 < 9 && quehayen[i + 1] == "B") {
+                    perder = false;
+                }
+            }
+            else if (quehayen[i] == "S") {
+                    if (i - 2 >= 0 && quehayen[i - 2] == "B") {
+                        perder = false;
+                    } else if (i - 1 >= 0 && quehayen[i - 1] == "B") {
+                        perder = false;
+                    }
+                }
+            }
+
+        return perder;
+    }
+
     private void compartir() {
-        Toast.makeText(getApplicationContext(),"GANÓ",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(),"Felicidades,ganó",Toast.LENGTH_SHORT).show();
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
@@ -172,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void iniciar(){
+        count=0;
         rs[0] = (ImageButton)findViewById(R.id.r1);
         rs[1] = (ImageButton) findViewById(R.id.r2);
         rs[2] = (ImageButton) findViewById(R.id.r3);
@@ -195,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0;i<9;i++){
             map.put(rs[i],i);
         }
+        posicion=4;
 
     }
 
