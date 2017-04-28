@@ -1,93 +1,237 @@
 package com.curso.rs;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
+
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.ImageButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    Button iniciar,reset;
+
+    public ImageButton aux;
+    public ImageButton rs[];
+    public Button accion,reset;
+    private Integer posicion;
+    public String r,s,b;
+    int posicion_actual,count;
+    HashMap <ImageButton,Integer> map;
+    String quehayen[];
+    RadioGroup rdgGroup;
+    private boolean tactil=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        rs = new ImageButton[9];
+
+        r = new String("R");
+        s = new String("S");
+        b= new String("B");
+        quehayen=new String[9];
+        map = new HashMap<ImageButton, Integer>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        iniciar = (Button) findViewById(R.id.button);
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+       iniciar();
+        accion = (Button) findViewById(R.id.accion);
+        reset = (Button )findViewById(R.id.reset);
+        rdgGroup= (RadioGroup) findViewById(R.id.rdgGrupo);
 
-        int width = (int) ((int)metrics.widthPixels * 0.9);
-        int height = (int) ((int)metrics.heightPixels * 0.25);
-
-
-
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-
-        final Paint paint = new Paint();
-        paint.setColor(Color.BLUE);
-
-        final Canvas canvas = new Canvas(bitmap);
-
-        canvas.drawColor(Color.GREEN);
-        int margen=5;
-        int separacion=5;
-        int width_f=width-margen;
-        final ArrayList rect = new ArrayList();
-
-        rect.add(new Rect(margen,margen,margen+width_f/9,height-margen));
-
-
-        for(int i=1;i<=8;i++) {
-            rect.add(new Rect(separacion+margen+width_f/9*i,margen,margen+width_f/9*(i+1),height-margen));
-        }
-        int count=0;
-        for (Object r:rect
-             ) {
-            if(count<4) {
-
-                canvas.drawRect((Rect) r, new Paint(Color.rgb(94, 62, 1)));
-
-            }else if(count!=4){
-                canvas.drawRect((Rect) r, new Paint(Color.rgb(96, 119, 1)));
-            }else
-                canvas.drawRect((Rect) r, new Paint(Color.WHITE));
-
-            count++;
-        }
-
-        ImageView imageView = (ImageView) findViewById(R.id.imageView);
-
-// Set this ImageView's bitmap to the one we have drawn to.
-        imageView.setImageBitmap(bitmap);
-        iniciar.setOnClickListener(new View.OnClickListener() {
+        rdgGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                paint.setColor(Color.BLACK);
-                canvas.drawRect((Rect)rect.get(4),paint);
+            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
+                if(i==R.id.tactil){
+                    tactil = true ;
+                    accion.setVisibility(View.INVISIBLE);
+                }else if(i==R.id.boton){
+                    tactil=false;
+                    accion.setVisibility(View.VISIBLE);
+                }
             }
         });
 
-// Create a simple layout and add our image view to it.
-//        RelativeLayout layout = (RelativeLayout)findViewById(R.id.principal);
-//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-//                RelativeLayout.LayoutParams.WRAP_CONTENT);
-//        //params.addRule(RelativeLayout.CENTER_IN_PARENT);
-//        layout.addView(imageView,params);
-//        layout.setBackgroundColor(Color.WHITE);
-//        setContentView(layout);
 
-// Show this layout in our activity.
+
+        for (final ImageButton im:rs
+             ) {
+
+            im.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    aux=im;
+                    posicion =map.get(im);
+                    if(tactil) {
+                        if (quehayen[posicion] == "R") {
+                            if (posicion+2<9 && quehayen[posicion + 2] == "B") {
+                                im.setImageResource(R.drawable.blanco);
+                                rs[posicion + 2].setImageResource(R.drawable.sapo);
+                                quehayen[posicion] = "B";
+                                quehayen[posicion + 2] = "R";
+                                sonar(1);
+                            } else if (posicion+1<9 && quehayen[posicion + 1] == "B") {
+                                im.setImageResource(R.drawable.blanco);
+                                rs[posicion + 1].setImageResource(R.drawable.sapo);
+                                quehayen[posicion] = "B";
+                                quehayen[posicion + 1] = "R";
+                                sonar(1);
+                            }
+                        } else if (quehayen[posicion] == "S") {
+                            if (posicion - 2 >= 0 && quehayen[posicion - 2] == "B") {
+                                im.setImageResource(R.drawable.blanco);
+                                rs[posicion - 2].setImageResource(R.drawable.rana);
+                                quehayen[posicion] = "B";
+                                quehayen[posicion - 2] = "S";
+                                sonar(0);
+                            } else if (posicion - 1 >= 0 &&quehayen[posicion - 1] == "B") {
+                                im.setImageResource(R.drawable.blanco);
+                                rs[posicion - 1].setImageResource(R.drawable.rana);
+                                quehayen[posicion] = "B";
+                                quehayen[posicion - 1] = "S";
+                                sonar(0);
+                            }
+                        }
+                        if(ganar()){
+                            compartir();
+                        }
+                    }
+                }
+            });
+        }
+
+        accion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!tactil) {
+                    if (quehayen[posicion] == "R") {
+                        if (quehayen[posicion + 2] == "B" && posicion+2<9) {
+                            aux.setImageResource(R.drawable.blanco);
+                            rs[posicion + 2].setImageResource(R.drawable.sapo);
+                            quehayen[posicion] = "B";
+                            quehayen[posicion + 2] = "R";
+                            sonar(1);
+                        } else if (quehayen[posicion + 1] == "B") {
+                            aux.setImageResource(R.drawable.blanco);
+                            rs[posicion + 1].setImageResource(R.drawable.sapo);
+                            quehayen[posicion] = "B";
+                            quehayen[posicion + 1] = "R";
+                            sonar(1);
+                        }
+                    } else if (quehayen[posicion] == "S") {
+                        if (posicion - 2 >= 0 && quehayen[posicion - 2] == "B") {
+                            aux.setImageResource(R.drawable.blanco);
+                            rs[posicion - 2].setImageResource(R.drawable.rana);
+                            quehayen[posicion] = "B";
+                            quehayen[posicion - 2] = "S";
+                            sonar(0);
+                        } else if (quehayen[posicion - 1] == "B") {
+                            aux.setImageResource(R.drawable.blanco);
+                            rs[posicion - 1].setImageResource(R.drawable.rana);
+                            quehayen[posicion] = "B";
+                            quehayen[posicion - 1] = "S";
+                            sonar(0);
+                        }
+                    }
+                    if(ganar()){
+                        compartir();
+                    }
+                }
+
+            }
+        });
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                iniciar();
+            }
+        });
+
+
+
 
     }
+
+    private void compartir() {
+        Toast.makeText(getApplicationContext(),"GANÓ",Toast.LENGTH_SHORT).show();
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT,"Gane en 24 pasos el juego Ranas y Sapos! \n Descarga el juego en el siguiente link!:"+"https://www.dropbox.com/s/a7eowgedsjio66w/Ranas%20y%20Sapos.apk?dl=0");
+        startActivity(shareIntent);
+    }
+
+    private void iniciar(){
+        rs[0] = (ImageButton)findViewById(R.id.r1);
+        rs[1] = (ImageButton) findViewById(R.id.r2);
+        rs[2] = (ImageButton) findViewById(R.id.r3);
+        rs[3] = (ImageButton) findViewById(R.id.r4);
+        rs[5] = (ImageButton) findViewById(R.id.s1);
+        rs[6] = (ImageButton) findViewById(R.id.s2);
+        rs[7] = (ImageButton) findViewById(R.id.s3);
+        rs[8] = (ImageButton) findViewById(R.id.s4);
+        rs[4] = (ImageButton) findViewById(R.id.blanco);
+        rs[4].setImageResource(R.drawable.blanco);
+        quehayen[4]="B";
+
+        for (int i = 0;i<4;i++){
+            rs[i].setImageResource(R.drawable.sapo);
+            quehayen[i]="R";
+        }
+        for (int i = 5;i<9;i++){
+            rs[i].setImageResource(R.drawable.rana);
+            quehayen[i]="S";
+        }
+        for (int i = 0;i<9;i++){
+            map.put(rs[i],i);
+        }
+
+    }
+
+    public boolean ganar(){
+        boolean ganar=true;
+        for (int i = 0;i<4;i++){
+            if(quehayen[i]!="S"){
+                ganar=false;
+            }
+        }for (int i = 5;i<9;i++){
+            if(quehayen[i]!="R"){
+                ganar=false;
+            }
+        }
+        if(quehayen[4]!="B") ganar = false;
+        return ganar;
+    }
+    private void sonar(int i){
+        if(i==0){
+        MediaPlayer rana = MediaPlayer.create(this, R.raw.rana);
+        rana.start();
+        rana.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+
+                mp.release();
+            }
+        });
+        }else{
+            MediaPlayer sapo = MediaPlayer.create(this, R.raw.sapo);
+            sapo.start();
+            sapo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                public void onCompletion(MediaPlayer mp) {
+
+                    mp.release();
+                }
+            });
+        }
+    }
+
 }
