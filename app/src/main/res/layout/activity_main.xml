@@ -110,38 +110,6 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <RadioGroup
-            android:id="@+id/rdgGrupo"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:checkedButton="@+id/tactil">
-
-            <RadioButton
-                android:id="@+id/tactil"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Tactil"
-                app:buttonTint="@android:color/holo_green_dark" />
-
-            <RadioButton
-                android:id="@+id/boton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Boton"
-                app:buttonTint="@android:color/holo_green_dark" />
-        </RadioGroup>
-
-        <Button
-            android:id="@+id/accion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Mover"
-            android:visibility="invisible" />
-
         <Button
             android:text="Reiniciar"
             android:layout_width="wrap_content"
